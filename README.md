@@ -1,6 +1,6 @@
 # barrel up
 
-This Go program is designed for to automate the creation of index files that export from subdirectories within the `src` folder.
+This Go program is designed for to automate the creation of index files that export from subdirectories within the `src` folder of a JSX/TSX project.
 
 ## Features
 
