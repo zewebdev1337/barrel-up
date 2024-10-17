@@ -9,52 +9,11 @@ import (
 	"strings"
 )
 
-// main is the entry point of the program.
-// It gets the current working directory, defines the src directory,
-// and then walks through the src directory. For each directory it encounters,
-// it creates an index file using the createIndexFile function.
-func main() {
-	// Get the current working directory
-	// If there's an error, print it and return from the function
-	cwd, err := os.Getwd()
-	if err != nil {
-		fmt.Println("Error getting current directory:", err)
-		return
-	}
-
-	// Define the src directory by joining the current working directory with "src"
-	srcDir := filepath.Join(cwd, "src")
-
-	// Walk through the src directory using the filepath.Walk function
-	// For each path encountered, check if it's a directory and if it's not the top-level src directory
-	// If it is, create an index file for that directory using the createIndexFile function
-	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// Skip if it's not a directory or if it's the top-level src directory
-		// This is to avoid creating an index file for the src directory itself
-		if !info.IsDir() || path == srcDir {
-			return nil
-		}
-
-		// Create index file for the current directory
-		createIndexFile(path)
-		return nil
-	})
-
-	// If there's an error while walking through the directory, print it
-	if err != nil {
-		fmt.Println("Error walking through directory:", err)
-	}
-}
-
-// createIndexFile is a function that generates an index file for a given directory.
+// createIndexFile generates an index file for a given directory.
 // It creates a new file named "index.ts" in the specified directory and writes an autogen comment at the top of the file.
 // Then, it reads the contents of the directory and checks each file to see if it has any export statements.
 // If a file has exports and its extension is ".ts", ".tsx", ".js", or ".jsx", the function writes an export statement for that file to the index file.
-// The function also checks for duplicate export statements to avoid writing them multiple times to the index file.
+// It also checks for duplicate export statements to avoid writing them multiple times to the index file.
 func createIndexFile(dir string) {
 	// Define the path for the index file by joining the directory path with "index.ts"
 	indexPath := filepath.Join(dir, "index.ts")
@@ -128,9 +87,9 @@ func createIndexFile(dir string) {
 	writer.Flush()
 }
 
-// The function hasExports checks if a file has any export statements.
+// hasExports checks if a file has any export statements.
 // It reads the content of the file and uses a regular expression to match export statements.
-// If any match is found, the function returns true, otherwise it returns false.
+// If any match is found, it returns true, otherwise it returns false.
 func hasExports(filePath string) bool {
 	// Read the content of the file
 	content, err := os.ReadFile(filePath)
@@ -150,4 +109,41 @@ func hasExports(filePath string) bool {
 	// If a match is found, return true
 	// Otherwise, return false
 	return exportRegex.Match(content)
+}
+
+func main() {
+	// Get the current working directory
+	// If there's an error, print it and return from the function
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		return
+	}
+
+	// Define the src directory by joining the current working directory with "src"
+	srcDir := filepath.Join(cwd, "src")
+
+	// Walk through the src directory using the filepath.Walk function
+	// For each path encountered, check if it's a directory and if it's not the top-level src directory
+	// If it is, create an index file for that directory using the createIndexFile function
+	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip if it's not a directory or if it's the top-level src directory
+		// This is to avoid creating an index file for the src directory itself
+		if !info.IsDir() || path == srcDir {
+			return nil
+		}
+
+		// Create index file for the current directory
+		createIndexFile(path)
+		return nil
+	})
+
+	// If there's an error while walking through the directory, print it
+	if err != nil {
+		fmt.Println("Error walking through directory:", err)
+	}
 }
